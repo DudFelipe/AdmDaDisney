@@ -1,0 +1,12 @@
+CREATE DATABASE AdmDisney;
+
+USE AdmDisney;
+
+CREATE TABLE Pedido
+(
+	Id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    Departamento VARCHAR(255) NOT NULL,
+    Descricao VARCHAR(255) NOT NULL,
+    Justificativa VARCHAR(255) NOT NULL,
+    Aprovacao INT NOT NULL
+);
