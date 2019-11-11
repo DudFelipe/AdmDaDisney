@@ -15,6 +15,19 @@ public class Pedido {
     private String descricao;
     private String justificativa;
     private int aprovacao;
+    
+    public Pedido(){
+        
+    }
+    
+    public Pedido(int id, String departamento, String descricao, String justificativa, int aprovacao){
+        this.id = id;
+        this.departamento = departamento;
+        this.descricao = descricao;
+        this.justificativa = justificativa;
+        this.aprovacao = aprovacao;
+        
+    }
 
     public int getId() {
         return id;
