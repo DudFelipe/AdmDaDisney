@@ -20,9 +20,8 @@ import java.util.List;
  */
 public class PedidoDAO {
     
-    public static void inserir(Pedido p) throws SQLException, Exception{
-        String sql = "INSERT INTO Pedido (Departamento, Descricao, Justificativa, Aprovacao)"
-                + " VALUES (?, ?, ?, ?);";
+    public static Pedido obterPedido(int id) throws SQLException, Exception{
+        String sql = "SELECT * FROM Pedido WHERE id = ?";
         
         Connection conn = null;
         PreparedStatement pst = null;
@@ -31,10 +30,56 @@ public class PedidoDAO {
             conn = ConnectionUtils.getConnection();
             pst = conn.prepareStatement(sql);
             
-            pst.setString(1, p.getDepartamento());
-            pst.setString(2, p.getDescricao());
-            pst.setString(3, p.getJustificativa());
-            pst.setInt(4, p.getAprovacao());
+            pst.setInt(1, id);
+            
+            ResultSet rs = pst.executeQuery();
+            
+            if(rs.next()){
+                Pedido p = new Pedido();
+                
+                p.setId(rs.getInt("id"));
+                p.setTitulo(rs.getString("Titulo"));
+                p.setDepartamento(rs.getString("Departamento"));
+                p.setDescricao(rs.getString("Descricao"));
+                p.setJustificativa(rs.getString("Justificativa"));
+                p.setAprovacao(rs.getInt("Aprovacao"));
+                
+                return p;
+            }
+            
+            return null;
+        }
+        catch(Exception ex){
+            return null;
+        }
+        finally{
+            if(pst != null && !pst.isClosed()){
+                pst.close();
+            }
+            
+            if(conn != null && !conn.isClosed()){
+                conn.close();
+            }
+        }
+        
+    }
+    
+    public static void inserir(Pedido p) throws SQLException, Exception{
+        String sql = "INSERT INTO Pedido (Titulo, Departamento, Descricao, Justificativa, Aprovacao)"
+                + " VALUES (?, ?, ?, ?, ?);";
+        
+        Connection conn = null;
+        PreparedStatement pst = null;
+        
+        try{
+            conn = ConnectionUtils.getConnection();
+            pst = conn.prepareStatement(sql);
+            
+            pst.setString(1, p.getTitulo());
+            pst.setString(2, p.getDepartamento());
+            pst.setString(3, p.getDescricao());
+            pst.setString(4, p.getJustificativa());
+            pst.setInt(5, p.getAprovacao());
             
             pst.execute();
         }
@@ -51,7 +96,7 @@ public class PedidoDAO {
     }
     
     public static void alterar(Pedido p) throws SQLException, Exception{
-        String sql = "UPDATE Pedido SET Departamento = ?, Descricao = ?, Justificativa = ?, Aprovacao = ? WHERE id = ?";
+        String sql = "UPDATE Pedido SET Titulo = ?, Departamento = ?, Descricao = ?, Justificativa = ?, Aprovacao = ? WHERE id = ?";
         
         Connection conn = null;
         PreparedStatement pst = null;
@@ -60,11 +105,12 @@ public class PedidoDAO {
             conn = ConnectionUtils.getConnection();
             pst = conn.prepareStatement(sql);
             
-            pst.setString(1, p.getDepartamento());
-            pst.setString(2, p.getDescricao());
-            pst.setString(3, p.getJustificativa());
-            pst.setInt(4, p.getAprovacao());
-            pst.setInt(5, p.getId());
+            pst.setString(1, p.getTitulo());
+            pst.setString(2, p.getDepartamento());
+            pst.setString(3, p.getDescricao());
+            pst.setString(4, p.getJustificativa());
+            pst.setInt(5, p.getAprovacao());
+            pst.setInt(6, p.getId());
             
             pst.execute();
         }
@@ -89,7 +135,7 @@ public class PedidoDAO {
             conn = ConnectionUtils.getConnection();
             pst = conn.prepareStatement(sql);
             
-            pst.setInt(0, id);
+            pst.setInt(1, id);
             
             pst.execute();
         }
@@ -122,6 +168,7 @@ public class PedidoDAO {
                 Pedido p = new Pedido();
                 
                 p.setId(rs.getInt("id"));
+                p.setTitulo(rs.getString("Titulo"));
                 p.setDepartamento(rs.getString("Departamento"));
                 p.setDescricao(rs.getString("Descricao"));
                 p.setJustificativa(rs.getString("Justificativa"));

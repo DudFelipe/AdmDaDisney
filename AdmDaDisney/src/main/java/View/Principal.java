@@ -17,10 +17,12 @@ import java.sql.Statement;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -29,14 +31,18 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Principal extends javax.swing.JFrame {
 
-    Connection connection = null;
-    String delete = "DELETE FROM epp.enc_ceia";
+    Pedido p = null;
 
     /**
      * Creates new form Principal
      */
     public Principal() {
         initComponents();
+        try {
+            limpaJTable();
+            readJTable();
+        } catch (ClassNotFoundException ex) {
+        }
     }
 
     /**
@@ -105,6 +111,11 @@ public class Principal extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(jTable1);
 
         jButton1.setText("Salvar");
@@ -128,8 +139,18 @@ public class Principal extends javax.swing.JFrame {
         jButton3.setText("Aprovar");
         jButton3.setMaximumSize(new java.awt.Dimension(65, 23));
         jButton3.setMinimumSize(new java.awt.Dimension(65, 23));
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setText("Negar");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
         jLabel4.setText("Departamento");
 
@@ -166,7 +187,7 @@ public class Principal extends javax.swing.JFrame {
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2))
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
                         .addGap(22, 22, 22)
                         .addComponent(jLabel4)
@@ -208,75 +229,156 @@ public class Principal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        try {
-            connection = ConnectionUtils.getConnection();
-            String departamento = cbbdep.getSelectedItem().toString();
-            String solicitacao = txttitulo.getText();
-            String descricao = txtdescri.getText();
-            String justificativa = txtjust.getText();
-            int aprovado = 0;
-          
-            String query = "INSERT INTO Pedido (Departamento, Descricao, Justificativa, Aprovacao)"
-                + "VALUES ("
-                        + "'" + departamento + "', "
-                        + "'" + descricao + "', "
-                        + "'" + justificativa + "',"
-                        + " '" + aprovado + "');";
+
+        if(p != null){
+            p.setDepartamento(cbbdep.getSelectedItem().toString());
+            p.setTitulo(txttitulo.getText());
+            p.setDescricao(txtdescri.getText());
+            p.setJustificativa(txtjust.getText());
+            p.setAprovacao(0);
+            
+            int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente alterar esse Pedido?", "Alterar", JOptionPane.YES_NO_OPTION);
+            if (reply == JOptionPane.YES_OPTION) {
+
+                try {
+                    PedidoDAO.alterar(p);
+                } catch (Exception ex) {
+
+                }
+                limpaJTable();
+
+                try {
+                    readJTable();
+                } catch (ClassNotFoundException ex) {
+                }
+
+                JOptionPane.showMessageDialog(null, "Dados alterados com sucesso!!");
+                LimparDados();
+
+            } else {
+                return;
+            }
+        }
+        else{
+            Pedido p = new Pedido();
+
+            p.setDepartamento(cbbdep.getSelectedItem().toString());
+            p.setTitulo(txttitulo.getText());
+            p.setDescricao(txtdescri.getText());
+            p.setJustificativa(txtjust.getText());
+            p.setAprovacao(0);
             
             int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente inserir os dados ?", "Inserir", JOptionPane.YES_NO_OPTION);
             if (reply == JOptionPane.YES_OPTION) {
 
-                Statement stmt = connection.createStatement();
-                stmt.executeUpdate(query);
-                connection.close();
-                DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-                modelo.setNumRows(0);
-                readJTable(selectByShop);
+                try {
+                    PedidoDAO.inserir(p);
+                } catch (Exception ex) {
+
+                }
+                limpaJTable();
+
+                try {
+                    readJTable();
+                } catch (ClassNotFoundException ex) {
+                }
+
                 JOptionPane.showMessageDialog(null, "Dados inseridos com sucesso!!");
                 LimparDados();
 
             } else {
                 return;
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-         try {
+        try {
             int linha = jTable1.getSelectedRow();
-            if (linha != -1) {
-                int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente apagar os dados ?", "Apagar", JOptionPane.YES_NO_OPTION);
-                if (reply == JOptionPane.YES_OPTION) {
-                    Deletar(delete + " WHERE `id`='" + jTable1.getValueAt(linha, 0).toString() + "';");
-                    DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
-                    modelo.setNumRows(0);
-                    readJTable();
-                    LimparDados();
-                    JOptionPane.showMessageDialog(null, "Dados apagados com sucesso!!");
-                } else {
-                    return;
-                }
+            
+            if(linha >= 0){
+                int id = Integer.parseInt(jTable1.getValueAt(linha, 0).toString());
+                
+                PedidoDAO.excluir(id);
+                
+                limpaJTable();
+                
+                readJTable();
             }
+
         } catch (SQLException ex) {
-            Logger.getLogger(Teste.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParseException ex) {
-            Logger.getLogger(Teste.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
         }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    public void readJTable(String s) throws ClassNotFoundException {
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        int linha = jTable1.rowAtPoint(evt.getPoint());
+        
+        if(linha >= 0){
+            int id = Integer.parseInt(jTable1.getValueAt(linha, 0).toString());
+            
+            try {
+                p = PedidoDAO.obterPedido(id);
+                
+                txtdescri.setText(p.getDescricao());
+                txtjust.setText(p.getJustificativa());
+                txttitulo.setText(p.getTitulo());
+                cbbdep.setSelectedItem(p.getDepartamento());
+                
+            } catch (Exception ex) {
+            }
+        }
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        if(p != null){
+            p.setAprovacao(1);
+            JOptionPane.showMessageDialog(null, "PEDIDO APROVADO!");
+            LimparDados();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "SELECIONE UM PEDIDO!");
+        }
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        if(p != null){
+            p.setAprovacao(0);
+            JOptionPane.showMessageDialog(null, "PEDIDO REPROVADO!");
+            LimparDados();
+        }
+        else{
+            JOptionPane.showMessageDialog(null, "SELECIONE UM PEDIDO!");
+        }
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void LimparDados(){
+        txttitulo.setText("");
+        txtjust.setText("");
+        txtdescri.setText("");
+        cbbdep.setSelectedIndex(0);
+        p = null;
+        
+    }
+    
+    public void readJTable() throws ClassNotFoundException {
+        List<Pedido> pedidos = null;
+        
+        try {
+            pedidos = PedidoDAO.listar();
+        } catch (Exception ex) {
+        }
+        
         DefaultTableModel modelo = (DefaultTableModel) jTable1.getModel();
         jTable1.getColumnModel().getColumn(4).setMinWidth(0);
         jTable1.getColumnModel().getColumn(4).setMaxWidth(0);
-        NumberFormat nf = NumberFormat.getCurrencyInstance();
-        for (Pedido p : read(s)) {
-            
+
+        for (Pedido p : pedidos) {
+
             modelo.addRow(new Object[]{
                 p.getId(),
+                p.getTitulo(),
                 p.getDepartamento(),
                 p.getDescricao(),
                 p.getJustificativa(),
@@ -285,42 +387,10 @@ public class Principal extends javax.swing.JFrame {
         }
     }
     
-    public List<Pedido> read(String sql) throws ClassNotFoundException {
-
-        List<Pedido> p = new ArrayList<Pedido>();
-
-        try {
-            // TODO add your handling code here:
-            connection = ConnectionUtils.getConnection();
-
-            Statement stmt = connection.createStatement();
-            stmt.executeQuery(sql);
-
-            ResultSet rs = stmt.getResultSet();
-
-            while (rs.next()) {
-                Pedido pedido = new Pedido();
-                pedido.setId(rs.getInt("id"));
-                pedido.setDepartamento(rs.getString("departamento"));
-                pedido.setDescricao(rs.getString("descricao"));
-                pedido.setJustificativa(rs.getString("justificativa"));
-                pedido.setAprovacao(rs.getInt("aprovacao"));
-                p.add(pedido);
-            }
-        } catch (SQLException ex) {
-            Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        return p;
+    private void limpaJTable(){
+        DefaultTableModel model = (DefaultTableModel)jTable1.getModel();   
+        model.setRowCount(0);
     }
-    
-    public void Deletar(String sql) throws SQLException, ParseException, ClassNotFoundException {
-        // TODO add your handling code here:
-        connection = ConnectionUtils.getConnection();
-        Statement stmt = null;
-        stmt = connection.createStatement();
-        stmt.executeUpdate(sql);
-    }
-    
     
     /**
      * @param args the command line arguments

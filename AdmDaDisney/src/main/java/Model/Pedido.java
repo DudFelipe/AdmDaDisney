@@ -11,6 +11,15 @@ package Model;
  */
 public class Pedido {
     private int id;
+    private String titulo;
+
+    public String getTitulo() {
+        return titulo;
+    }
+
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
+    }
     private String departamento;
     private String descricao;
     private String justificativa;
@@ -20,12 +29,13 @@ public class Pedido {
         
     }
     
-    public Pedido(int id, String departamento, String descricao, String justificativa, int aprovacao){
+    public Pedido(int id, String titulo, String departamento, String descricao, String justificativa, int aprovacao){
         this.id = id;
         this.departamento = departamento;
         this.descricao = descricao;
         this.justificativa = justificativa;
         this.aprovacao = aprovacao;
+        this.titulo = titulo;
         
     }
 
