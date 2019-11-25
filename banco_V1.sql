@@ -5,8 +5,9 @@ USE AdmDisney;
 CREATE TABLE Pedido
 (
 	Id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    Titulo VARCHAR(255) NOT NULL,
     Departamento VARCHAR(255) NOT NULL,
-    Descricao VARCHAR(255) NOT NULL,
+    Descricao VARCHAR(500) NOT NULL,
     Justificativa VARCHAR(255) NOT NULL,
     Aprovacao INT NOT NULL
 );
