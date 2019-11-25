@@ -5,10 +5,12 @@
  */
 package View;
 
+import DAO.EnviaEmail;
 import DAO.PedidoDAO;
 import Model.Pedido;
 import Utils.ConnectionUtils;
 import java.awt.HeadlessException;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -64,16 +66,16 @@ public class Principal extends javax.swing.JFrame {
         jLabel3 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
-        jButton4 = new javax.swing.JButton();
+        btnSalvar = new javax.swing.JButton();
+        btnExcluir = new javax.swing.JButton();
+        btnaprove = new javax.swing.JButton();
+        btnNao = new javax.swing.JButton();
         jLabel4 = new javax.swing.JLabel();
         txtjust = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        cbbdep.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "RH", "Vendas", "Marketing", "TI", "Operações" }));
+        cbbdep.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Comercial", "Financeiro", "Logística", "Materiais", "Operações", "Produção", "RH", "TI", "Vendas" }));
 
         jLabel1.setText("Solicitação");
 
@@ -118,37 +120,37 @@ public class Principal extends javax.swing.JFrame {
         });
         jScrollPane2.setViewportView(jTable1);
 
-        jButton1.setText("Salvar");
-        jButton1.setMaximumSize(new java.awt.Dimension(65, 23));
-        jButton1.setMinimumSize(new java.awt.Dimension(65, 23));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnSalvar.setText("Salvar");
+        btnSalvar.setMaximumSize(new java.awt.Dimension(65, 23));
+        btnSalvar.setMinimumSize(new java.awt.Dimension(65, 23));
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnSalvarActionPerformed(evt);
             }
         });
 
-        jButton2.setText("Excluir");
-        jButton2.setMaximumSize(new java.awt.Dimension(65, 23));
-        jButton2.setMinimumSize(new java.awt.Dimension(65, 23));
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnExcluir.setText("Excluir");
+        btnExcluir.setMaximumSize(new java.awt.Dimension(65, 23));
+        btnExcluir.setMinimumSize(new java.awt.Dimension(65, 23));
+        btnExcluir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnExcluirActionPerformed(evt);
             }
         });
 
-        jButton3.setText("Aprovar");
-        jButton3.setMaximumSize(new java.awt.Dimension(65, 23));
-        jButton3.setMinimumSize(new java.awt.Dimension(65, 23));
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+        btnaprove.setText("Aprovar");
+        btnaprove.setMaximumSize(new java.awt.Dimension(65, 23));
+        btnaprove.setMinimumSize(new java.awt.Dimension(65, 23));
+        btnaprove.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnaproveActionPerformed(evt);
             }
         });
 
-        jButton4.setText("Negar");
-        jButton4.addActionListener(new java.awt.event.ActionListener() {
+        btnNao.setText("Negar");
+        btnNao.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton4ActionPerformed(evt);
+                btnNaoActionPerformed(evt);
             }
         });
 
@@ -169,13 +171,13 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(cbbdep, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(txttitulo)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(34, 34, 34)
-                        .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(33, 33, 33)
-                        .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(btnaprove, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(27, 27, 27)
-                        .addComponent(jButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
+                        .addComponent(btnNao, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
                     .addComponent(txtjust))
                 .addGap(18, 18, Short.MAX_VALUE)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 419, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -207,10 +209,10 @@ public class Principal extends javax.swing.JFrame {
                         .addComponent(txtjust, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(115, 115, 115)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton4))))
+                            .addComponent(btnSalvar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnExcluir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnaprove, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnNao))))
                 .addContainerGap(22, Short.MAX_VALUE))
         );
 
@@ -228,7 +230,7 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
 
         if(p != null){
             p.setDepartamento(cbbdep.getSelectedItem().toString());
@@ -290,9 +292,9 @@ public class Principal extends javax.swing.JFrame {
                 return;
             }
         }
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }//GEN-LAST:event_btnSalvarActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void btnExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnExcluirActionPerformed
         try {
             int linha = jTable1.getSelectedRow();
             
@@ -310,7 +312,7 @@ public class Principal extends javax.swing.JFrame {
         } catch (ParseException ex) {
         } catch (Exception ex) {
         }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }//GEN-LAST:event_btnExcluirActionPerformed
 
     private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
         int linha = jTable1.rowAtPoint(evt.getPoint());
@@ -331,27 +333,37 @@ public class Principal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jTable1MouseClicked
 
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+    private void btnaproveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnaproveActionPerformed
         if(p != null){
             p.setAprovacao(1);
             JOptionPane.showMessageDialog(null, "PEDIDO APROVADO!");
+            try {
+                EnviaEmail.enviaEmail(p);
+            } catch (IOException ex) {
+                System.out.println("Pedido não encontrado");
+            }
             LimparDados();
         }
         else{
             JOptionPane.showMessageDialog(null, "SELECIONE UM PEDIDO!");
         }
-    }//GEN-LAST:event_jButton3ActionPerformed
+    }//GEN-LAST:event_btnaproveActionPerformed
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+    private void btnNaoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNaoActionPerformed
         if(p != null){
             p.setAprovacao(0);
             JOptionPane.showMessageDialog(null, "PEDIDO REPROVADO!");
+            try {
+                EnviaEmail.enviaEmail(p);
+            } catch (IOException ex) {
+                System.out.println("Pedido não encontrado");
+            }
             LimparDados();
         }
         else{
             JOptionPane.showMessageDialog(null, "SELECIONE UM PEDIDO!");
         }
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }//GEN-LAST:event_btnNaoActionPerformed
 
     private void LimparDados(){
         txttitulo.setText("");
@@ -359,7 +371,6 @@ public class Principal extends javax.swing.JFrame {
         txtdescri.setText("");
         cbbdep.setSelectedIndex(0);
         p = null;
-        
     }
     
     public void readJTable() throws ClassNotFoundException {
@@ -428,11 +439,11 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbbdep;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton btnExcluir;
+    private javax.swing.JButton btnNao;
+    private javax.swing.JButton btnSalvar;
+    private javax.swing.JButton btnaprove;
+    public static javax.swing.JComboBox<String> cbbdep;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

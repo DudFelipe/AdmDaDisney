@@ -26,7 +26,7 @@ public class ConnectionUtils {
         Connection connection = null;
         //Só tenta abrir uma conexão se não existir ou estiver fechada            
         //Endereço de conexão com o banco de dados
-        String dbURL = "jdbc:mysql://localhost:3306/AdmDisney";
+        String dbURL = "jdbc:mysql://localhost:3307/AdmDisney";
 
         Class.forName("com.mysql.jdbc.Driver");
 
