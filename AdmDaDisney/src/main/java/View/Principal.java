@@ -51,7 +51,7 @@ public class Principal extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
         }
     }
-
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -235,66 +235,83 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private int ValidaCampos(){
+        if(txttitulo.getText().length() == 0){
+            JOptionPane.showMessageDialog(null, "Preencha o título", "Erro no titulo", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+        if(txtdescri.getText().length() == 0){
+            JOptionPane.showMessageDialog(null, "Preencha a descrição", "Erro na descrição", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+        
+        return 1;
+    }
+    
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
 
-        if(p != null){
-            p.setDepartamento(cbbdep.getSelectedItem().toString());
-            p.setTitulo(txttitulo.getText());
-            p.setDescricao(txtdescri.getText());
-            p.setJustificativa(txtjust.getText());
-            p.setAprovacao(0);
-            
-            int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente alterar esse Pedido?", "Alterar", JOptionPane.YES_NO_OPTION);
-            if (reply == JOptionPane.YES_OPTION) {
+        int valido = ValidaCampos();
+        
+        if(valido == 1){
+            if(p != null){
+                p.setDepartamento(cbbdep.getSelectedItem().toString());
+                p.setTitulo(txttitulo.getText());
+                p.setDescricao(txtdescri.getText());
+                p.setJustificativa(txtjust.getText());
+                p.setAprovacao(0);
 
-                try {
-                    PedidoDAO.alterar(p);
-                } catch (Exception ex) {
+                int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente alterar esse Pedido?", "Alterar", JOptionPane.YES_NO_OPTION);
+                if (reply == JOptionPane.YES_OPTION) {
 
+                    try {
+                        PedidoDAO.alterar(p);
+                    } catch (Exception ex) {
+
+                    }
+                    limpaJTable();
+
+                    try {
+                        readJTable();
+                    } catch (ClassNotFoundException ex) {
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Dados alterados com sucesso!!");
+                    LimparDados();
+
+                } else {
+                    return;
                 }
-                limpaJTable();
-
-                try {
-                    readJTable();
-                } catch (ClassNotFoundException ex) {
-                }
-
-                JOptionPane.showMessageDialog(null, "Dados alterados com sucesso!!");
-                LimparDados();
-
-            } else {
-                return;
             }
-        }
-        else{
-            Pedido p = new Pedido();
+            else{
+                Pedido p = new Pedido();
 
-            p.setDepartamento(cbbdep.getSelectedItem().toString());
-            p.setTitulo(txttitulo.getText());
-            p.setDescricao(txtdescri.getText());
-            p.setJustificativa(txtjust.getText());
-            p.setAprovacao(0);
-            
-            int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente inserir os dados ?", "Inserir", JOptionPane.YES_NO_OPTION);
-            if (reply == JOptionPane.YES_OPTION) {
+                p.setDepartamento(cbbdep.getSelectedItem().toString());
+                p.setTitulo(txttitulo.getText());
+                p.setDescricao(txtdescri.getText());
+                p.setJustificativa(txtjust.getText());
+                p.setAprovacao(0);
 
-                try {
-                    PedidoDAO.inserir(p);
-                } catch (Exception ex) {
+                int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente inserir os dados ?", "Inserir", JOptionPane.YES_NO_OPTION);
+                if (reply == JOptionPane.YES_OPTION) {
 
+                    try {
+                        PedidoDAO.inserir(p);
+                    } catch (Exception ex) {
+
+                    }
+                    limpaJTable();
+
+                    try {
+                        readJTable();
+                    } catch (ClassNotFoundException ex) {
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Dados inseridos com sucesso!!");
+                    LimparDados();
+
+                } else {
+                    return;
                 }
-                limpaJTable();
-
-                try {
-                    readJTable();
-                } catch (ClassNotFoundException ex) {
-                }
-
-                JOptionPane.showMessageDialog(null, "Dados inseridos com sucesso!!");
-                LimparDados();
-
-            } else {
-                return;
             }
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
@@ -425,6 +442,7 @@ public class Principal extends javax.swing.JFrame {
                 });
             }
         }
+
     }
     
     private void limpaJTable(){
