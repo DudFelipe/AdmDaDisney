@@ -26,6 +26,11 @@ import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
+import com.lowagie.text.*;
+import com.lowagie.text.pdf.PdfWriter;
 
 /**
  *
@@ -46,7 +51,7 @@ public class Principal extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
         }
     }
-
+   
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -230,66 +235,83 @@ public class Principal extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private int ValidaCampos(){
+        if(txttitulo.getText().length() == 0){
+            JOptionPane.showMessageDialog(null, "Preencha o título", "Erro no titulo", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+        if(txtdescri.getText().length() == 0){
+            JOptionPane.showMessageDialog(null, "Preencha a descrição", "Erro na descrição", JOptionPane.ERROR_MESSAGE);
+            return 0;
+        }
+        
+        return 1;
+    }
+    
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
 
-        if(p != null){
-            p.setDepartamento(cbbdep.getSelectedItem().toString());
-            p.setTitulo(txttitulo.getText());
-            p.setDescricao(txtdescri.getText());
-            p.setJustificativa(txtjust.getText());
-            p.setAprovacao(0);
-            
-            int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente alterar esse Pedido?", "Alterar", JOptionPane.YES_NO_OPTION);
-            if (reply == JOptionPane.YES_OPTION) {
+        int valido = ValidaCampos();
+        
+        if(valido == 1){
+            if(p != null){
+                p.setDepartamento(cbbdep.getSelectedItem().toString());
+                p.setTitulo(txttitulo.getText());
+                p.setDescricao(txtdescri.getText());
+                p.setJustificativa(txtjust.getText());
+                p.setAprovacao(0);
 
-                try {
-                    PedidoDAO.alterar(p);
-                } catch (Exception ex) {
+                int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente alterar esse Pedido?", "Alterar", JOptionPane.YES_NO_OPTION);
+                if (reply == JOptionPane.YES_OPTION) {
 
+                    try {
+                        PedidoDAO.alterar(p);
+                    } catch (Exception ex) {
+
+                    }
+                    limpaJTable();
+
+                    try {
+                        readJTable();
+                    } catch (ClassNotFoundException ex) {
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Dados alterados com sucesso!!");
+                    LimparDados();
+
+                } else {
+                    return;
                 }
-                limpaJTable();
-
-                try {
-                    readJTable();
-                } catch (ClassNotFoundException ex) {
-                }
-
-                JOptionPane.showMessageDialog(null, "Dados alterados com sucesso!!");
-                LimparDados();
-
-            } else {
-                return;
             }
-        }
-        else{
-            Pedido p = new Pedido();
+            else{
+                Pedido p = new Pedido();
 
-            p.setDepartamento(cbbdep.getSelectedItem().toString());
-            p.setTitulo(txttitulo.getText());
-            p.setDescricao(txtdescri.getText());
-            p.setJustificativa(txtjust.getText());
-            p.setAprovacao(0);
-            
-            int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente inserir os dados ?", "Inserir", JOptionPane.YES_NO_OPTION);
-            if (reply == JOptionPane.YES_OPTION) {
+                p.setDepartamento(cbbdep.getSelectedItem().toString());
+                p.setTitulo(txttitulo.getText());
+                p.setDescricao(txtdescri.getText());
+                p.setJustificativa(txtjust.getText());
+                p.setAprovacao(0);
 
-                try {
-                    PedidoDAO.inserir(p);
-                } catch (Exception ex) {
+                int reply = JOptionPane.showConfirmDialog(null, "Deseja realmente inserir os dados ?", "Inserir", JOptionPane.YES_NO_OPTION);
+                if (reply == JOptionPane.YES_OPTION) {
 
+                    try {
+                        PedidoDAO.inserir(p);
+                    } catch (Exception ex) {
+
+                    }
+                    limpaJTable();
+
+                    try {
+                        readJTable();
+                    } catch (ClassNotFoundException ex) {
+                    }
+
+                    JOptionPane.showMessageDialog(null, "Dados inseridos com sucesso!!");
+                    LimparDados();
+
+                } else {
+                    return;
                 }
-                limpaJTable();
-
-                try {
-                    readJTable();
-                } catch (ClassNotFoundException ex) {
-                }
-
-                JOptionPane.showMessageDialog(null, "Dados inseridos com sucesso!!");
-                LimparDados();
-
-            } else {
-                return;
             }
         }
     }//GEN-LAST:event_btnSalvarActionPerformed
@@ -338,10 +360,21 @@ public class Principal extends javax.swing.JFrame {
             p.setAprovacao(1);
             JOptionPane.showMessageDialog(null, "PEDIDO APROVADO!");
             try {
-                EnviaEmail.enviaEmail(p);
+                Document doc = CriaPDF(p);
+                
+                if(doc == null){
+                    throw new Exception("Deu merda");
+                }
+                
+                EnviaEmail.enviaEmail(doc, p);
             } catch (IOException ex) {
                 System.out.println("Pedido não encontrado");
             }
+            catch(Exception ex){
+                ex.printStackTrace();
+                System.out.println(ex.getMessage());
+            }
+            
             LimparDados();
         }
         else{
@@ -354,10 +387,21 @@ public class Principal extends javax.swing.JFrame {
             p.setAprovacao(0);
             JOptionPane.showMessageDialog(null, "PEDIDO REPROVADO!");
             try {
-                EnviaEmail.enviaEmail(p);
+                Document doc = CriaPDF(p);
+                
+                if(doc == null){
+                    throw new Exception("Deu merda");
+                }
+                
+                EnviaEmail.enviaEmail(doc, p);
             } catch (IOException ex) {
                 System.out.println("Pedido não encontrado");
             }
+            catch(Exception ex){
+                ex.printStackTrace();
+                System.out.println(ex.getMessage());
+            }
+            
             LimparDados();
         }
         else{
@@ -385,22 +429,57 @@ public class Principal extends javax.swing.JFrame {
         jTable1.getColumnModel().getColumn(4).setMinWidth(0);
         jTable1.getColumnModel().getColumn(4).setMaxWidth(0);
 
-        for (Pedido p : pedidos) {
+        if(pedidos != null){
+            for (Pedido p : pedidos) {
 
-            modelo.addRow(new Object[]{
-                p.getId(),
-                p.getTitulo(),
-                p.getDepartamento(),
-                p.getDescricao(),
-                p.getJustificativa(),
-                p.getAprovacao()
-            });
+                modelo.addRow(new Object[]{
+                    p.getId(),
+                    p.getTitulo(),
+                    p.getDepartamento(),
+                    p.getDescricao(),
+                    p.getJustificativa(),
+                    p.getAprovacao()
+                });
+            }
         }
+
     }
     
     private void limpaJTable(){
         DefaultTableModel model = (DefaultTableModel)jTable1.getModel();   
         model.setRowCount(0);
+    }
+    
+    private Document CriaPDF(Pedido p){
+        Document doc = new Document();
+        String status;
+        
+        try{
+            PdfWriter.getInstance(doc, new FileOutputStream("Solicitacao" + p.getId() + ".pdf"));
+            
+            doc.open();
+            
+            if(p.getAprovacao() == 0){
+                status = "Negada";
+            }
+            else{
+                status = "Aprovada";
+            }
+            
+            doc.add(new Paragraph("A solicitação intitulada '" + p.getTitulo() + "' feita pelo departamento de '" + p.getDepartamento() +
+                            "' da qual a descrição é: '" + p.getDescricao() + "'\n" +
+                            "Foi " + status + " diante a justificativa de '" + p.getJustificativa() + "'\n\n" +
+                            "Assinado: Departamento administrativo"));
+            
+            return doc;
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+            return null;
+        }
+        finally{
+            doc.close();
+        }
     }
     
     /**
